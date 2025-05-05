@@ -9,6 +9,7 @@
       text-align: center;
       margin-top: 80px;
       background-color: #ffe6e6;
+      overflow: hidden;
     }
     h1 {
       color: #e60073;
@@ -39,15 +40,35 @@
     input[type="text"] {
       width: 300px;
     }
+
+    .heart {
+      color: #ff3399;
+      font-size: 24px;
+      position: absolute;
+      animation: float 5s linear infinite;
+      user-select: none;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1.5);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>Will you be my Valentine? 💘</h1>
 
-  <input type="text" id="nickname" placeholder="Your name or nickname..." required><br>
-
-  <button id="yesBtn">Yes 😍</button>
-  <button id="noBtn">No 🙈</button>
+  <div id="formArea">
+    <input type="text" id="nickname" placeholder="Your name or nickname..." required><br>
+    <button id="yesBtn">Yes 😍</button>
+    <button id="noBtn">No 🙈</button>
+  </div>
 
   <div id="response"></div>
 
@@ -56,7 +77,8 @@
     const noBtn = document.getElementById("noBtn");
     const responseDiv = document.getElementById("response");
     const nicknameInput = document.getElementById("nickname");
-    const formEndpoint = "https://formspree.io/f/xgvkaroq"; // 🔁 Nahraď vlastním Form ID
+    const formArea = document.getElementById("formArea");
+    const formEndpoint = "https://formspree.io/f/xgvkaroq";
 
     function sendAnswer(answer) {
       const nickname = nicknameInput.value.trim();
@@ -65,7 +87,6 @@
         return;
       }
 
-      // Získání IP adresy přes ipify
       fetch('https://api.ipify.org?format=json')
         .then(res => res.json())
         .then(data => {
@@ -86,6 +107,8 @@
           .then(res => res.ok ? "Odpověď přijata! 💌" : "Chyba při odeslání.")
           .then(msg => {
             responseDiv.textContent = msg;
+            formArea.style.display = "none";
+            launchHearts();
           })
           .catch(err => {
             responseDiv.textContent = "Chyba: " + err.message;
@@ -111,6 +134,24 @@
     noBtn.addEventListener("click", () => {
       sendAnswer("No 🙈");
     });
+
+    function launchHearts() {
+      const interval = setInterval(() => {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.fontSize = Math.random() * 20 + 20 + "px";
+        heart.textContent = "💖";
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+          heart.remove();
+        }, 5000);
+      }, 200);
+
+      // Stop creating hearts after 10 seconds
+      setTimeout(() => clearInterval(interval), 10000);
+    }
   </script>
 </body>
 </html>
