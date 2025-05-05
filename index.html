@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,24 +65,35 @@
         return;
       }
 
-      fetch(formEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          name: nickname,
-          answer: answer
+      // Získání IP adresy přes ipify
+      fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(data => {
+          const ip = data.ip;
+
+          fetch(formEndpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              name: nickname,
+              answer: answer,
+              ip: ip
+            })
+          })
+          .then(res => res.ok ? "Odpověď přijata! 💌" : "Chyba při odeslání.")
+          .then(msg => {
+            responseDiv.textContent = msg;
+          })
+          .catch(err => {
+            responseDiv.textContent = "Chyba: " + err.message;
+          });
         })
-      })
-      .then(res => res.ok ? "Odpověď přijata! 💌" : "Chyba při odeslání.")
-      .then(msg => {
-        responseDiv.textContent = msg;
-      })
-      .catch(err => {
-        responseDiv.textContent = "Chyba: " + err.message;
-      });
+        .catch(err => {
+          responseDiv.textContent = "Chyba při získávání IP: " + err.message;
+        });
     }
 
     yesBtn.addEventListener("click", () => {
